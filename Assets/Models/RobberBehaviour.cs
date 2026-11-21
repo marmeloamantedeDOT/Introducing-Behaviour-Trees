@@ -33,20 +33,13 @@ public class RobberBehaviour : MonoBehaviour
         opendoor.AddChild(goToBackDoor);
         
 
-        //steal.AddChild(goToFrontDoor);
+        steal.AddChild(opendoor);
         steal.AddChild(goToDiamond);
       //  steal.AddChild(goToBackDoor);
         steal.AddChild(goToVan);
         tree.AddChild(steal);
 
-        /*Node eat = new Node("Eat Something");
-        Node pizza = new Node("Go To Pizza Shop");
-        Node buy = new Node("Buy Pizza");
-
-        eat.AddChild(pizza);
-        eat.AddChild(buy);
-        tree.AddChild(eat); */
-
+  
         tree.PrintTree();
 
         
@@ -56,21 +49,40 @@ public class RobberBehaviour : MonoBehaviour
     {
         //agent.SetDestination(diamond.transform.position);
         //return Node.Status.SUCCESS;
-        return GoToLocation(diamond.transform.position);
+       Node.Status s = GoToLocation(diamond.transform.position);
+        if (s == Node.Status.SUCCESS)
+        {
+            diamond.transform.parent = this.gameObject.transform;
+        }
+        return s;
     }
-
-    public Node.Status GoToBackDoor()
-    {
-        return GoToLocation(backdoor.transform.position);
-    }
-
     public Node.Status GoToFrontDoor()
     {
-        return GoToLocation(frontdoor.transform.position);
+        return GoToDoor(frontdoor);
+    }
+    public Node.Status GoToBackDoor()
+    {
+        return GoToDoor(backdoor);
     }
     public Node.Status GoToVan()
     {
         return GoToLocation(van.transform.position);
+    }
+
+    public Node.Status GoToDoor(GameObject door)
+    {
+        Node.Status s = GoToLocation(door.transform.position);
+        if (s == Node.Status.SUCCESS)
+        {
+            if (!door.GetComponent<Lock>().isLocked)
+            {
+                door.SetActive(false);
+                return Node.Status.SUCCESS;
+            }
+            return Node.Status.FAILURE;
+        }
+        else
+            return s;
     }
     Node.Status GoToLocation(Vector3 destination)
     {
